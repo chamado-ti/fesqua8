@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Campanha</title>
+
+<style>
+  body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    z-index: 2;
+  }
+
+  #startScreen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+  }
+
+  #botao {
+    background: white;
+    color: black;
+
+    width: 260px;
+    height: 260px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 22px;
+    text-align: center;
+    font-weight: bold;
+
+    border-radius: 30px;
+    cursor: pointer;
+
+    box-shadow: 0 0 40px rgba(255,255,255,0.8);
+    animation: pulse 1.3s infinite;
+  }
+
+  @media (max-width: 600px) {
+    #botao {
+      width: 280px;
+      height: 280px;
+      font-size: 24px;
+    }
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+</style>
+</head>
+
+<body>
+
+<canvas id="particles"></canvas>
+
+<div id="startScreen">
+  <div id="botao">👆 CLIQUE AQUI!<br>E veja o que te aguarda!</div>
+</div>
+
+<video id="video" playsinline controls>
+  <source src="audio3.mp4" type="video/mp4">
+</video>
+
+<script>
+  const video = document.getElementById('video');
+  const startScreen = document.getElementById('startScreen');
+  const particlesCanvas = document.getElementById('particles');
+
+  document.getElementById('botao').addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    particlesCanvas.style.display = 'none';
+
+    video.style.display = 'block';
+    video.muted = false;
+
+    video.play();
+
+    if (video.requestFullscreen) {
+      video.requestFullscreen();
+    } else if (video.webkitRequestFullscreen) {
+      video.webkitRequestFullscreen();
+    }
+  });
+
+  // ===== PARTÍCULAS =====
+  const ctx = particlesCanvas.getContext("2d");
+
+  function resizeCanvas() {
+    particlesCanvas.width = window.innerWidth;
+    particlesCanvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
+
+  let particles = [];
+
+  function createParticles() {
+    particles = [];
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * particlesCanvas.width,
+        y: Math.random() * particlesCanvas.height,
+        size: Math.random() * 3,
+        speedX: (Math.random() - 0.5) * 1,
+        speedY: (Math.random() - 0.5) * 1
+      });
+    }
+  }
+
+  createParticles();
+
+  function animate() {
+    ctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+
+    particles.forEach(p => {
+      p.x += p.speedX;
+      p.y += p.speedY;
+
+      if (p.x < 0 || p.x > particlesCanvas.width) p.speedX *= -1;
+      if (p.y < 0 || p.y > particlesCanvas.height) p.speedY *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = "white";
+      ctx.fill();
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  window.addEventListener("resize", () => {
+    resizeCanvas();
+    createParticles();
+  });
+</script>
+
+</body>
+</html>
